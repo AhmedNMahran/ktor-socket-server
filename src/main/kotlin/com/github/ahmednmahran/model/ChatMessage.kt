@@ -1,4 +1,4 @@
-package com.github.ahmednmahran.common.model
+package com.github.ahmednmahran.model
 
 import kotlinx.serialization.Serializable
 

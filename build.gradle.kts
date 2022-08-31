@@ -8,7 +8,7 @@ plugins {
     kotlin("plugin.serialization") version "1.4.21"
 }
 
-group = "com.example"
+group = "com.github.ahmednmahran"
 version = "0.0.1"
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")

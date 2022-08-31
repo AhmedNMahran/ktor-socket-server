@@ -1,7 +1,9 @@
-package com.example
+package com.github.ahmednmahran
 
 import io.ktor.server.application.*
-import com.example.plugins.*
+import com.github.ahmednmahran.plugins.*
+import com.github.ahmednmahran.plugins.configureRouting
+import com.github.ahmednmahran.plugins.configureSockets
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
 

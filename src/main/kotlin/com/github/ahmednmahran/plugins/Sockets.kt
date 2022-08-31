@@ -1,4 +1,4 @@
-package com.example.plugins
+package com.github.ahmednmahran.plugins
 
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
@@ -7,8 +7,8 @@ import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import java.util.*
 import kotlin.collections.LinkedHashSet
-import com.example.Connection
-import com.github.ahmednmahran.common.model.ChatMessage
+import com.github.ahmednmahran.Connection
+import com.github.ahmednmahran.model.ChatMessage
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
