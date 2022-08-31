@@ -1,16 +1,16 @@
 package com.example.plugins
 
-import io.ktor.network.sockets.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import java.time.Duration
 import io.ktor.server.application.*
-import io.ktor.server.response.*
-import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import java.util.*
 import kotlin.collections.LinkedHashSet
 import com.example.Connection
+import com.github.ahmednmahran.common.model.ChatMessage
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 fun Application.configureSockets() {
     install(WebSockets) {
@@ -30,7 +30,8 @@ fun Application.configureSockets() {
                 for (frame in incoming) {
                     frame as? Frame.Text ?: continue
                     val receivedText = frame.readText()
-                    val textWithUsername = "[${thisConnection.name}]: $receivedText"
+                    val textWithUsername = Json.encodeToString(ChatMessage(receivedText,thisConnection.name))
+                    println(textWithUsername)
                     connections.forEach {
                         it.session.send(textWithUsername)
                     }
