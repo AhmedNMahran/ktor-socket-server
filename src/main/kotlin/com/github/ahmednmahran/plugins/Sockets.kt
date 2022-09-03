@@ -8,7 +8,10 @@ import io.ktor.server.routing.*
 import java.util.*
 import kotlin.collections.LinkedHashSet
 import com.github.ahmednmahran.Connection
+import com.github.ahmednmahran.chatCredential
 import com.github.ahmednmahran.model.ChatMessage
+import io.ktor.server.auth.*
+import io.ktor.server.sessions.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -19,11 +22,17 @@ fun Application.configureSockets() {
         maxFrameSize = Long.MAX_VALUE
         masking = false
     }
+
     routing {
         val connections = Collections.synchronizedSet<Connection?>(LinkedHashSet())
+
         webSocket("/chat") {
             println("Adding user!")
+            val userName = call.principal<UserIdPrincipal>()?.name.toString()
+            println("userNameBB:$userName")
+            val userSession = call.sessions.get<UserSession>()
             val thisConnection = Connection(this)
+            thisConnection.name = chatCredential.name
             connections += thisConnection
             try {
                 send("You are connected! There are ${connections.count()} users here.")
