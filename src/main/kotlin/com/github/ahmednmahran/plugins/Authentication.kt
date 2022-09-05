@@ -2,6 +2,7 @@ package com.github.ahmednmahran.plugins
 
 
 import com.github.ahmednmahran.chatCredential
+import com.github.ahmednmahran.domain.DatabaseRepository
 import com.github.ahmednmahran.model.ChatUser
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
@@ -24,8 +25,13 @@ fun Application.configureAuth() {
         basic("auth-basic") {
             realm = "Access to the '/' path"
             validate { credentials ->
-                if (credentials.name == "jetbrains" && credentials.password == "foobar") {
-                    chatCredential = credentials
+
+                chatCredential = credentials
+                val user = DatabaseRepository.getUsers().find {
+                    it.username == credentials.name && it.password == credentials.password
+                }
+
+                if (user != null) {
                     UserIdPrincipal(credentials.name)
                 } else {
                     null
@@ -34,7 +40,7 @@ fun Application.configureAuth() {
         }
         session<UserSession>("auth-session") {
             validate { session ->
-                if(session.name.startsWith("jet")) {
+                if(session.name.isNotBlank()) {
                     session
                 } else {
                     null

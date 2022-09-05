@@ -10,7 +10,9 @@ import kotlin.collections.LinkedHashSet
 import com.github.ahmednmahran.Connection
 import com.github.ahmednmahran.chatCredential
 import com.github.ahmednmahran.model.ChatMessage
+import io.ktor.http.*
 import io.ktor.server.auth.*
+import io.ktor.server.response.*
 import io.ktor.server.sessions.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -27,14 +29,16 @@ fun Application.configureSockets() {
         val connections = Collections.synchronizedSet<Connection?>(LinkedHashSet())
 
         webSocket("/chat") {
+
             println("Adding user!")
-            val userName = call.principal<UserIdPrincipal>()?.name.toString()
-            println("userNameBB:$userName")
-            val userSession = call.sessions.get<UserSession>()
             val thisConnection = Connection(this)
-            thisConnection.name = chatCredential.name
-            connections += thisConnection
             try {
+                val userName = call.principal<UserIdPrincipal>()?.name.toString()
+                println("userNameBB:$userName")
+                val userSession = call.sessions.get<UserSession>()
+
+                thisConnection.name = chatCredential.name
+                connections += thisConnection
                 send("You are connected! There are ${connections.count()} users here.")
                 for (frame in incoming) {
                     frame as? Frame.Text ?: continue
@@ -45,7 +49,11 @@ fun Application.configureSockets() {
                         it.session.send(textWithUsername)
                     }
                 }
-            } catch (e: Exception) {
+            }
+            catch (e: UninitializedPropertyAccessException){
+                call.respond(HttpStatusCode.Unauthorized,"you are logged out!")
+            }
+            catch (e: Exception) {
                 println(e.localizedMessage)
             } finally {
                 println("Removing $thisConnection!")
