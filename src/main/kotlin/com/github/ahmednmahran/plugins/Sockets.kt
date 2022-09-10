@@ -39,7 +39,9 @@ fun Application.configureSockets() {
 
                 thisConnection.name = chatCredential.name
                 connections += thisConnection
-                send("You are connected! There are ${connections.count()} users here.")
+                connections.forEach {
+                    it.session.send("You are connected! There are ${connections.count()} users here.")
+                }
                 for (frame in incoming) {
                     frame as? Frame.Text ?: continue
                     val receivedText = frame.readText()
