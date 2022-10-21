@@ -21,4 +21,6 @@ you can test with this client project https://github.com/AhmedNMahran/compose-kt
 
 ## version 0.5:
 - send number of users to all sessions
+- send image urls with users
+- add some dummy users and update message sending logic
 - Todo : add database
