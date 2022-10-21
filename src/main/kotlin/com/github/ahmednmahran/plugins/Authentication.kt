@@ -3,7 +3,6 @@ package com.github.ahmednmahran.plugins
 
 import com.github.ahmednmahran.chatCredential
 import com.github.ahmednmahran.domain.DatabaseRepository
-import com.github.ahmednmahran.model.ChatUser
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import io.ktor.server.auth.*
@@ -57,7 +56,7 @@ fun Application.configureAuth() {
             post("/login") {
                 val userName = call.principal<UserIdPrincipal>()?.name.toString()
                 call.sessions.set(UserSession(name = userName, count = 1))
-                call.respond(Json.encodeToString(ChatUser(username = userName,"","")))
+                call.respond(Json.encodeToString(DatabaseRepository.getUsers().find { it.username == userName }))
             }
         }
     }
