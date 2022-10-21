@@ -9,13 +9,10 @@ import java.util.*
 import kotlin.collections.LinkedHashSet
 import com.github.ahmednmahran.Connection
 import com.github.ahmednmahran.chatCredential
-import com.github.ahmednmahran.model.ChatMessage
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 fun Application.configureSockets() {
     install(WebSockets) {
@@ -44,11 +41,10 @@ fun Application.configureSockets() {
                 }
                 for (frame in incoming) {
                     frame as? Frame.Text ?: continue
-                    val receivedText = frame.readText()
-                    val textWithUsername = Json.encodeToString(ChatMessage(receivedText,thisConnection.name))
-                    println(textWithUsername)
+                    val receivedMessage = frame.readText()
+                    println(receivedMessage)
                     connections.forEach {
-                        it.session.send(textWithUsername)
+                        it.session.send(receivedMessage)
                     }
                 }
             }
