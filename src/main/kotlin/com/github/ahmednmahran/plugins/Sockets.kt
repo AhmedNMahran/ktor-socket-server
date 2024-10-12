@@ -9,10 +9,13 @@ import java.util.*
 import kotlin.collections.LinkedHashSet
 import com.github.ahmednmahran.Connection
 import com.github.ahmednmahran.chatCredential
+import com.github.ahmednmahran.domain.DatabaseRepository
 import io.ktor.http.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 fun Application.configureSockets() {
     install(WebSockets) {
@@ -33,10 +36,9 @@ fun Application.configureSockets() {
                 val userName = call.principal<UserIdPrincipal>()?.name.toString()
                 println("userNameBB:$userName")
                 val userSession = call.sessions.get<UserSession>()
-
                 thisConnection.name = chatCredential.name
                 connections += thisConnection
-                connections.forEach {
+                connections.distinct().forEach {
                     it.session.send("You are connected! There are ${connections.count()} users here.")
                 }
                 for (frame in incoming) {
@@ -44,18 +46,29 @@ fun Application.configureSockets() {
                     val receivedMessage = frame.readText()
                     println(receivedMessage)
                     connections.forEach {
+                        println("sending $receivedMessage")
                         it.session.send(receivedMessage)
                     }
                 }
             }
             catch (e: UninitializedPropertyAccessException){
                 call.respond(HttpStatusCode.Unauthorized,"you are logged out!")
+                println("logged out!")
             }
             catch (e: Exception) {
                 println(e.localizedMessage)
             } finally {
                 println("Removing $thisConnection!")
                 connections -= thisConnection
+            }
+
+            // HTTP endpoint to get all connected users
+            get("/connected-users") {
+                val userList = DatabaseRepository.getUsers().filter {
+                    connections.filterNotNull().map { connection -> connection.name }.contains(it.username)
+                }   // Get all usernames
+                call.respond(Json.encodeToString(userList))  // Respond with the list of connected users
+
             }
         }
     }

@@ -55,7 +55,9 @@ fun Application.configureAuth() {
         authenticate("auth-basic") {
             post("/login") {
                 val userName = call.principal<UserIdPrincipal>()?.name.toString()
-                call.sessions.set(UserSession(name = userName, count = 1))
+                if(call.sessions.get<UserSession>()?.name != userName) {
+                    call.sessions.set(UserSession(name = userName, count = 1))
+                }
                 call.respond(Json.encodeToString(DatabaseRepository.getUsers().find { it.username == userName }))
             }
         }
