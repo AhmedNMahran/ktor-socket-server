@@ -10,10 +10,13 @@ import kotlin.collections.LinkedHashSet
 import com.github.ahmednmahran.Connection
 import com.github.ahmednmahran.chatCredential
 import com.github.ahmednmahran.domain.DatabaseRepository
+import com.github.ahmednmahran.model.ChatMessage
 import io.ktor.http.*
+import io.ktor.network.sockets.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -44,8 +47,11 @@ fun Application.configureSockets() {
                 for (frame in incoming) {
                     frame as? Frame.Text ?: continue
                     val receivedMessage = frame.readText()
+                    val message : ChatMessage = Json.decodeFromString(receivedMessage)
                     println(receivedMessage)
-                    connections.forEach {
+                    message.to?.let { to ->
+                        connections.filter { it.name == to }
+                    } ?: connections.forEach {
                         println("sending $receivedMessage")
                         it.session.send(receivedMessage)
                     }
