@@ -8,10 +8,12 @@ import io.ktor.server.routing.*
 import io.ktor.server.auth.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-data class UserSession(val name: String, val count: Int) : Principal
+@Serializable
+data class UserSession(val name: String, val count: Int)
 
 fun Application.configureAuth() {
     install(Sessions) {
